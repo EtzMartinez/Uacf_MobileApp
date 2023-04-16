@@ -1,41 +1,26 @@
-// import { StatusBar } from 'expo-status-bar';
-// import React, { useState } from 'react';
-// import { StyleSheet, Text, View, Button } from 'react-native';
-
-// export default function App() {
-//   // useState: returns the value of the state variable and a function that can be used to update it
-//   const [outputText, setOutputText] = useState('We Love COP 4331'); 
-//   return (
-//     <View style={styles.container}>
-//       <Text>{outputText}</Text>
-//       <Button title="Change Text" onPress={()=>setOutputText('We REALLY Love COP 4331')}/>
-//       <StatusBar style="auto" />
-//     </View>
-//   );
-// }
-
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: '#fff',
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//   },
-// });
-
 // App.js
 
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import { createStackNavigator } from "react-navigation-stack";
 import { createAppContainer } from "react-navigation";
+
+//for landing page navigation
+// import 'react-native-gesture-handler';  // finalizes the import for the hamburger menu
+// import {
+//   createDrawerNavigator,
+//   DrawerContentScrollView,
+//   DrawerItemList,
+//   DrawerItem,
+// } from '@react-navigation/drawer';
+// import { Feather } from "@expo/vector-icons";
 
 import LoginScreen from './screens/LoginScreen';
 import CardScreen from './screens/CardScreen';
 import RegisterScreen from './screens/RegScreen';
 import TestScreen from './screens/TestScreen';
 import LandingScreen from './screens/LandingScreen';
+import ClassScreen from './screens/ClassesScreen';
 
 export default class App extends React.Component {
   render() {
@@ -53,13 +38,16 @@ const AppNavigator = createStackNavigator({
   Card: {
     screen: CardScreen,
     navigationOptions: {
-      header: null // Will hide header for HomePage
+      header: null 
     }
   },
   Register: {
     screen: RegisterScreen,
-    navigationOptions: {
-      header: null
+    navigationOptions:{
+      title: null,
+      headerStyle: { backgroundColor: "#F8CD46" },
+      headerBackTitle: "Login Screen",
+      headerTintColor: 'black',
     }
   },
   Test: {
@@ -68,10 +56,45 @@ const AppNavigator = createStackNavigator({
       header: null
     }
   },
-  Landing:{
+  Landing: {
     screen: LandingScreen,
+    navigationOptions: ({ navigation }) => ({
+      title: "Events",
+      headerTitleStyle: {
+        fontSize: 20,
+        fontWeight: 'bold'
+      },
+      headerStyle: { 
+        backgroundColor: "#F8CD46",
+        borderBottomWidth: 2,
+        borderBottomColor: 'black',
+      },
+      headerBackTitleStyle: { fontSize: 17 },
+      headerBackTitle: "Sign out",
+      headerTintColor: 'black',
+      headerRight: () => (
+        <TouchableOpacity onPress={() => navigation.navigate('Classes')}>
+          <Text style={{ marginRight: 10, fontSize: 17 }}>View Classes</Text>
+        </TouchableOpacity>
+      ),
+    }),
+  },
+  Classes:{
+    screen: ClassScreen,
     navigationOptions:{
-      header: null
+      title: "Classes",
+      headerTitleStyle: {
+        fontSize: 20,
+        fontWeight: 'bold'
+      },
+      headerStyle: { 
+        backgroundColor: "#F8CD46",
+        borderBottomWidth: 2,
+        borderBottomColor: 'black',
+      },
+      headerBackTitleStyle: { fontSize: 17 },
+      headerBackTitle: "Events",
+      headerTintColor: 'black',
     }
   }
 },{
