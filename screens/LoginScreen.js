@@ -3,15 +3,20 @@
 import React, { Component, useState } from 'react';
 import { ActivityIndicator, Button, View, Text, TextInput, Image, ImageBackground } from 'react-native';
 
-global.localName = '';
-global.password = '';
-global.userId = -1;
-global.firstName = '';
-global.lastName = '';
-global.search = '';
-global.card = '';
+// global.localName = '';
+// global.password = '';
+// global.userId = -1;
+// global.firstName = '';
+// global.lastName = '';
 
-export default class Homescreen extends Component {
+export const localName = '';
+export const password = '';
+export const userId = -1;
+export const firstName = '';
+export const lastName = '';
+
+
+export default class LoginScreen extends Component {
 
   constructor() 
   {
@@ -24,49 +29,54 @@ export default class Homescreen extends Component {
 
   render(){
     return(
+      <ImageBackground source={require('../assets/LoginBG.jpg')} style ={{flex:1}}>
       <View style={styles.container}>
-      {/* <Image
-            style = {styles.back}
-            source = {require('../assets/unsplash-BG.jpg')}
-      /> */}
       
       <View style={styles.body}>
-        <Image 
-            style = {styles.logo}
-            source = {require('../assets/logo-border.png')}
-        />
-        <Text style={{fontSize:10}}> </Text>
+        <View style={styles.logoTitleContainer}>
+          <Image
+            source={require('../assets/logo-border.png')}
+            style={styles.logo}
+          />
+          <View style={styles.titleContainer}>
+            <Text style={styles.title}>
+                {" "} U [Actually] Can {"\n"} Finish Scheduling
+            </Text>
+          </View>
+        </View>
+
+        <Text style={{fontSize:15}}> </Text>
         <View style={{alignItems: 'flex-end'}}>
           
-        <View style={{ flexDirection:'row' }}>
-          <Text style={{fontSize:20}}>Username: </Text>
-          <TextInput
-            style={{height: 30,fontSize:20, backgroundColor:'#ffffff'}}
-            placeholder="Username"
-            onChangeText={(val) => { this.changeLoginNameHandler(val) }}
-          />        
-        </View>
-        {/* Below line places space between text/images */}
-        <Text style={{fontSize:10}}> </Text>
+          <View style={{ flexDirection:'row' }}>
+            <Text style={{fontSize:20}}>Username: </Text>
+            <TextInput
+              style={styles.textInp}
+              placeholder=" Username"
+              onChangeText={(val) => { this.changeLoginNameHandler(val) }}
+            />        
+          </View>
+          {/* Below line places space between text/images */}
+          <Text style={{fontSize:10}}> </Text>
 
-        <View style={{ flexDirection:'row' }}>
-          <Text style={{fontSize:20}}>Password: </Text>
-          <TextInput
-            style={{height: 30,fontSize:20, backgroundColor:'#ffffff'}}
-            placeholder="Password"
-            secureTextEntry={true}
-            onChangeText={(val) => { this.changePasswordHandler(val) }}
-          />
-        </View>
-        <Text style={{fontSize:20}}>{this.state.message} </Text>
+          <View style={{ flexDirection:'row' }}>
+            <Text style={{fontSize:20}}>Password: </Text>
+            <TextInput
+              style={styles.textInp}
+              placeholder=" Password"
+              secureTextEntry={true}
+              onChangeText={(val) => { this.changePasswordHandler(val) }}
+            />
+          </View>
+          <Text style={{fontSize:15}}>{this.state.message} </Text>
         </View>
 
         <Button
-          title="Do Login"
+          title="Login"
           onPress={this.handleClick}
         />
         <Button
-          title="Don't have an account? Register here."
+          title="Register"
           onPress={ () => this.props.navigation.navigate('Register')} //onPress takes in a function
           //  no input, followed by action
         />
@@ -80,8 +90,14 @@ export default class Homescreen extends Component {
           onPress={ () => this.props.navigation.navigate('Test')} //onPress takes in a function
           //  no input, followed by action
         />
-    </View>
-    </View> 
+        <Button
+          title="skip login"
+          onPress={ () => this.props.navigation.navigate('Landing')} //onPress takes in a function
+          //  no input, followed by action
+        />
+      </View>
+      </View>
+      </ImageBackground>
     );
   }
 
@@ -99,7 +115,7 @@ export default class Homescreen extends Component {
 
       if( res.id <= 0 )
       {
-        this.setState({message: "Usere/Password combination incorrect" });
+        this.setState({message: "User/Password combination incorrect" });
       }
       else
       {
@@ -133,7 +149,7 @@ const styles = {
     flex: 1,                  // takes up the available width of the container ( relative to other flex values of other objects)
     justifyContent: 'center', // aligns items by Row
     alignItems: 'center',     // aligns items by Column
-    backgroundColor: '#aaaaa0',
+    //backgroundColor: '#aaaaa0',
   },
   body: {
     borderRadius: 10,
@@ -152,15 +168,33 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
   },
-  logo:  {
-    width: 125,
-    height: 125,
-    resizeMode: 'contain',
+  
+  textInp: {
+    height: 30,
+    width: 120,
+    fontSize:20, 
+    backgroundColor:'#ffffff',
+    borderRadius: 5
   },
-  back: {
-    flex: .5,
-    justifyContent: 'center',
+
+  logoTitleContainer: {
+    flexDirection: 'row',
     alignItems: 'center',
-    elavation: -1,
-  }
+
+  },
+  titleContainer: {
+    paddingBottom: 5,
+    borderBottomWidth: 3,
+    borderBottomColor: 'black',
+  },
+  logo: {
+    width: 70,
+    height: 70,
+    marginRight: 10,
+  },
+  title: {
+    fontWeight: 'bold',
+    fontSize: 20,
+  },
+
 }
