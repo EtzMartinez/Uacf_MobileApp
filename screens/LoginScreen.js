@@ -1,5 +1,3 @@
-// Loginscreen.js
-
 import React, { Component, useState } from 'react';
 import { ActivityIndicator, Button, View, Text, TextInput, Image, ImageBackground } from 'react-native';
 
@@ -11,9 +9,10 @@ import { ActivityIndicator, Button, View, Text, TextInput, Image, ImageBackgroun
 
 export const localName = '';
 export const password = '';
-export const userId = -1;
+export const id = '';
 export const firstName = '';
 export const lastName = '';
+export const token = '';
 
 
 export default class LoginScreen extends Component {
@@ -105,15 +104,17 @@ export default class LoginScreen extends Component {
   {
     try
     {
-      var obj = {login:global.loginName.trim(),password:global.password.trim()};
+      var obj = {Login:global.loginName.trim(),Password:global.password.trim()};
       var js = JSON.stringify(obj);
 
-      const response = await fetch('https://cop4331-ucaf1.herokuapp.com/user/login',
+      const response = await fetch('http://cop4331-ucaf1.herokuapp.com/user/login',
         {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
 
       var res = JSON.parse(await response.text());
 
-      if( res.id <= 0 )
+      console.log("JSON ID:" + res.id);
+
+      if( res.success == false )
       {
         this.setState({message: "User/Password combination incorrect" });
       }
@@ -121,7 +122,9 @@ export default class LoginScreen extends Component {
       {
         global.firstName = res.firstName;
         global.lastName = res.lastName;
-        global.userId = res.id;
+        global.id = res.id;
+        global.token = res.CookieToken;
+        console.log("From Login screen ------ userID: " + global.id + ", Token: "+ global.token);
         this.props.navigation.navigate('Landing');
       }
     }
