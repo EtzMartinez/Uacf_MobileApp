@@ -1,4 +1,4 @@
-// Loginscreen.js
+// RegScreen.js
 
 import React, { Component, useState } from 'react';
 import { ImageBackground, Button, View, Text, TextInput } from 'react-native';
@@ -87,7 +87,13 @@ export default class RegisterScreen extends Component {
 
         <Button
           title="Register"
-          onPress={this.handleClick}
+          onPress={() => {
+            this.handleClick().then(succeed => {
+              if (succeed){
+                this.sendVerificationEmail();
+              }
+            })
+          }}
         />
       </View>
       </View>
@@ -95,41 +101,91 @@ export default class RegisterScreen extends Component {
     );
   }
 
+  // registers user and calls the function that send the verification email
   handleClick = async () =>
   {
     try
     {
-        var obj = {
-            FirstName: global.firstName.trim(),
-            LastName: global.lastName.trim(),
-            login: global.loginName.trim(),
-            password: global.password.trim(),
-            Email: global.email.trim()
-        };
-        var js = JSON.stringify(obj);
+      var obj = {
+        FirstName: global.firstName.trim(),
+        LastName: global.lastName.trim(),
+        login: global.loginName.trim(),
+        password: global.password.trim(),
+        Email: global.email.trim()
+      };
+      var js = JSON.stringify(obj);
 
-        const response = await fetch('https://cop4331-ucaf1.herokuapp.com/user/register',
-            {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
+      const response = await fetch('https://cop4331-ucaf1.herokuapp.com/user/register',
+        {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
 
-        var res = JSON.parse(await response.text());
+      var res = JSON.parse(await response.text());
+      console.log("register JSON return: ");
+      console.log(res);
 
-        if( res.id <= 0 )
-        {
-            this.setState({message: "New user failed to be created" });
-        }
-        else
-        {
-            global.firstName = res.firstName;
-            global.lastName = res.lastName;
-            global.userId = res.id;
-            this.setState({message: "New User Created. Please register your E-mail!" });
-        }
+      if( res.Success == false )
+      {
+        this.setState({message: "New user failed to be created" });
+      }
+      else
+      {
+
+        global.userId = res.User.insertedId;
+
+        console.log("res.id: " + res.User.insertedId + "     global.userId" + global.userId);
+
+        console.log("User Created, Now sending verification email");
+        // this.sendVerificationEmail();
+        
+
+        this.setState({message: "New User Created. Please register your E-mail." });
+
+        return res.Success;
+      }
     }
     catch(e)
     {
       this.setState({message: e.message });
     }
-  }  
+  } //end of creating new user endpoint call
+
+  sendVerificationEmail = async() => {
+    try{
+      console.log("id: " + global.userId + "  first name: " + global.firstName + "  last name: "+ global.lastName);
+
+      var obj = { userId : global.userId }
+      console.log("142: test 1");
+
+      var js = JSON.stringify(obj);
+
+      console.log("JSON to be sent to email/sendverification");
+      console.log(js);
+      console.log("146: test 2");
+      const response = await fetch('https://cop4331-ucaf1.herokuapp.com/email/sendverification',
+        {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
+
+      console.log("150: test 3");
+
+      var res = JSON.parse(await response.text());
+      console.log("email verification response: ");
+      console.log(res);
+
+      if (res.Success == false){
+        console.log("Threw: Email Not Sent Successfully");
+        throw "Email Not Sent Successfully"
+      }
+      else{
+        console.log("Email sent");
+      }
+
+    }
+    catch(e){
+      console.log("sendVerificationEmail error message:");
+      console.log(e);
+      this.setState({message: e.message})
+    }
+
+  }
+
 
   changeFirstNameHandler = async (val) =>
   {

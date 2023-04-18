@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, TextInput, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, StyleSheet, SafeAreaView, TouchableOpacity, Alert } from 'react-native';
 import { FlatList, ScrollView } from 'react-native-gesture-handler';
 import { localName, password, id, firstName, lastName, token } from './LoginScreen';
 
@@ -42,35 +42,54 @@ const ClassItem = ({ lectureCode, lectureType, lectureNumber, times, teachingPro
     </TouchableOpacity>
   </View>
 );
-const TakenClassItem = ({ lectureCode, onDeleteTakenClass }) => (
+const TakenClassItem = ({ lectureCode }) => (
   // the "..." below allows me to add to hte flatListClassStyling
-  <View style={{...styles.flatListClassStyling, paddingVertical: 20}}>
+  <View style={{...styles.flatListClassStyling, paddingVertical: 30}}>
     <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
       {/* class code*/}
       <Text style={styles.lectureCode}>{lectureCode}</Text>
-      <TouchableOpacity style={styles.smallButton} onPress={onDeleteTakenClass}>
+    </View>
+  </View>
+);
+const CurrentClassItem = ({lectureCode, lectureType, lectureNumber, times, teachingProfessorFN, teachingProfessorLN, room, onDeleteClass}) => {
+  // intermediary function that will call alert box 
+  const handleDeleteConfirmation = () => {
+    Alert.alert(
+      'Confirm Deletion',
+      'Are you sure you want to delete this class?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel'
+        },
+        {
+          text: 'Delete',
+          onPress: () => onDeleteClass()
+        }
+      ],
+      { cancelable: false }
+    );
+  }
+
+  return (
+    <View style={styles.flatListClassStyling}>
+      <View>
+        {/* class code, type, and number */}
+        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+          <Text style={styles.lectureCode}>{lectureCode}--{lectureType}</Text>
+          <Text style={styles.lectureNumber}>{lectureNumber}</Text>
+        </View> 
+        <Text style={styles.classTimes}>{times}</Text>
+        <Text>{room}</Text>
+        <Text style={styles.professorName}>{teachingProfessorFN} {teachingProfessorLN}</Text>
+      </View>
+      <TouchableOpacity style={styles.smallButton} onPress={handleDeleteConfirmation}>
         <Text style={styles.smallButtonText}>Delete</Text>
       </TouchableOpacity>
     </View>
-  </View>
-);
-const CurrentClassItem = ({lectureCode, lectureType, lectureNumber, times, teachingProfessorFN, teachingProfessorLN, room, onDeleteClass}) => (
-  <View style={styles.flatListClassStyling}>
-    <View>
-      {/* class code, type, and number */}
-      <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-        <Text style={styles.lectureCode}>{lectureCode}--{lectureType}</Text>
-        <Text style={styles.lectureNumber}>{lectureNumber}</Text>
-      </View> 
-      <Text style={styles.classTimes}>{times}</Text>
-      <Text>{room}</Text>
-      <Text style={styles.professorName}>{teachingProfessorFN} {teachingProfessorLN}</Text>
-    </View>
-    <TouchableOpacity style={styles.smallButton} onPress={onDeleteClass}>
-      <Text style={styles.smallButtonText}>Delete</Text>
-    </TouchableOpacity>
-  </View>
-);
+  );
+}
+
 
 
 
@@ -106,7 +125,7 @@ export default class ClassScreen extends Component {
       currentClassTabMessage: '',
 
       // variables for the taken Classes tab
-      takenClasses: [
+      takenClassesArray: [
         // "COP3223C",// "CDA3103",// "COP3502C"
       ],
       takenClassCode: '',
@@ -132,6 +151,21 @@ export default class ClassScreen extends Component {
     };
   }
 
+  
+  componentDidMount () {
+    // look at Landing screen for a description of the below
+    this.getTakenClasses().then(classesInputted => {
+      this.setState({takenClassesArray: classesInputted}, () => {
+        console.log("ComponentDidMount takeClassesArray:");
+        console.log(this.state.takenClassesArray);
+      });
+    }).catch(error => {
+      console.log("componentDidMount error");
+      console.log(error);
+    })
+
+  }
+
   render() {
     // below line is the same as writing:
     // const selectedChoiceIndex = this.state.selectedChoiceIndex;
@@ -147,7 +181,10 @@ export default class ClassScreen extends Component {
             {choices.map((c, index) => (
               <TouchableOpacity key={index} onPress={() => {
                 if (index === 1) {
-                  // Call getUsersCurrentClasses and update state with the results
+                  
+                  //Callback Functions: Call getUsersCurrentClasses, after the call was successful store the 
+                  //  returned array in currentClassesArray, then report to the console that the 
+                  //  class array was returned properly, then change the tab to 'Current Classes'
                   this.getUsersCurrentClasses()
                     .then(classes => {
                       this.setState({currentClassesArray: classes}, () => {
@@ -228,12 +265,7 @@ export default class ClassScreen extends Component {
                 <View style={styles.detailsHeader}>
                   <Text style={styles.detailsText}>{choices[selectedChoiceIndex].text}</Text>
                 </View>
-                {/* 
-                <TextInput 
-                  style={styles.classCodeInput}
-                  placeholder=' Enter Class Code'
-                  onChangeText={this.handleTakenClassCodeChange} 
-                /> */}
+
                 {/* below button makes API call and stores the taken class for this user in the database */}
                 {/* <TouchableOpacity style={styles.universalButton} onPress={this.htcc(tcc = this.takenClassCode)}>
                   <Text style={styles.universalButtonText}>Add Class</Text>
@@ -244,21 +276,16 @@ export default class ClassScreen extends Component {
                   <Text style = {styles.updateTextStyle}>{this.state.addTakenClassMessage}{"\n"}</Text> */}
                 </View>
 
-                <View style={ [styles.offeredClassesContainer, {height: 650}] }>
-                  {/* <FlatList
-                    data={this.state.takenClasses}
-                    renderItem={({ item }) => (
-                      <TakenClassItem
-                        lectureCode={item}    //item.code?
-                        onDeleteClass={() => this.handleDeleteTakenClass(item)}
-                      
-                      />
-                    )}
-                    // might not like below
-                    keyExtractor={(item) => {
-                      return item;
-                    }}
-                  />*/}
+                  {/* all I am gonna have to do is display the User's taken classes */}
+                <View>
+                  {this.state.takenClassesArray && this.state.takenClassesArray.length > 0 ? 
+                    this.state.takenClassesArray.map((classObj) => (
+                      <View>
+                        <Text style={{alignSelf:'center', fontSize:18}}> {classObj.Code} </Text>
+                      </View>
+                  )) :
+                      <Text style={{alignSelf:'center', fontSize:18}}>No classes taken yet.</Text>
+                  }
                 </View>
 
               </View>
@@ -329,6 +356,7 @@ export default class ClassScreen extends Component {
   // Delete class from taken list
   handleDeleteTakenClass = async (selectedClass) => {
     // TODO
+    console.log("Calling handleDeleteTakenClass function");
     if (userId == '' || token == '') {
       this.props.navigation.navigate('Login');
     }
@@ -358,7 +386,7 @@ export default class ClassScreen extends Component {
         }
       }
       else {
-        this.setState({takenClasses: res.ClassesTaken});
+        this.setState({takenClassesArray: res.ClassesTaken});
       }
     } catch (error) {
       console.log(error);
@@ -574,8 +602,8 @@ export default class ClassScreen extends Component {
   }
  
   htcc = (tcc) => {        // kind of working .... I need a break tho
-    if ( !this.state.takenClasses.includes(tcc)){
-      this.state.takenClasses.push(tcc);
+    if ( !this.state.takenClassesArray.includes(tcc)){
+      this.state.takenClassesArray.push(tcc);
     }
   }
 
@@ -585,8 +613,8 @@ export default class ClassScreen extends Component {
   //   // need to update both current state array and database through API call
     
   //   // first state array.
-  //   if ( !this.state.takenClasses.includes(tcc)){
-  //     this.state.takenClasses.push(tcc);
+  //   if ( !this.state.takenClassesArray.includes(tcc)){
+  //     this.state.takenClassesArray.push(tcc);
   //   }
   // };
 
@@ -718,38 +746,45 @@ export default class ClassScreen extends Component {
     }
     catch (e)
     {
-      // this.setState syntax to alter state variable for a class component (not functional component)
+      // this.setState syntax to alter state variable for//Callback Functions: a function that is passed as an argument to antoher function and is called back at a later time a class component (not functional component)
       this.setState({message: e.message });
       console.log(e.message);
     }
   };  // end of searchNewClass endpoint
 
   // endpoints for searching for class arrays for users
-  takenClasses = async() => {
+  getTakenClasses = async() => {
     try {
+      console.log("Attempting to getTakenClasses =========================================");
+
       const result = await fetch(`https://cop4331-ucaf1.herokuapp.com/user/getClassesTaken/${global.id}/${global.token}`, {
-        method: 'Get',
+        method: 'GET',
         headers: {
           Accept: 'application/json',
         },
       });
 
+      console.log("fetch done");
       const json = await result.json();
-      
+      console.log("JSON parsed");
       if (!json.Success) {
         throw 'Invalid Token';
       }
 
-      console.log(json);
+      console.log("\n\njson for getTakenClasses");
+      //console.log(json);
       let classes = [];
 
       for (let i = 0; i < json.Classes.length; i++) {
         classes.push(json.Classes[i]);
-        console.log(classes[i]);
+        console.log("class pushed");
       }
 
-      return classesTaken;
+      console.log(classes);
+      return classes;
+    
     } catch (e) {
+      console.log("Error from getTakenClasses")
       console.log(e);
     }
   };

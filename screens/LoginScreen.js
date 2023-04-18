@@ -80,8 +80,8 @@ export default class LoginScreen extends Component {
           //  no input, followed by action
         />
         <Button
-          title="To Cards Page"
-          onPress={ () => this.props.navigation.navigate('Card')} //onPress takes in a function
+          title="Password Recovery"
+          onPress={ () => this.props.navigation.navigate('Password')} //onPress takes in a function
           //  no input, followed by action
         />
         <Button
@@ -114,12 +114,13 @@ export default class LoginScreen extends Component {
 
       console.log("JSON ID:" + res.id);
 
-      if( res.success == false )
-      {
+      if( res.success == false ){
         this.setState({message: "User/Password combination incorrect" });
       }
-      else
-      {
+      else if (res.Verified == false){
+        this.setState({message: "Please Verify Your E-Mail."});
+      }
+      else{
         global.firstName = res.firstName;
         global.lastName = res.lastName;
         global.id = res.id;

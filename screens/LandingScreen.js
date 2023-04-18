@@ -67,7 +67,7 @@ export default class LandingScreen extends Component {
           dateIndex: 4,
           text: 'Class 5'
         },
-        {
+        { 
           dateIndex: 5,
           text: 'Class 6'
         },
@@ -79,13 +79,10 @@ export default class LandingScreen extends Component {
     };
   }
 
-  // componentDidMount(){
-  //   const nestedWeekArray = this.getCurrentClasses();
-  //   // console.log( " test test " + nestedWeekArray[1][0].Code);
-  //   this.setState({currentClasses: nestedWeekArray});
-
-  // }
-
+  //Callback Functions: a function that is passed as an argument to antoher function and is called back at a later time
+  //    Good for handling events and passing data between components
+  //componentDidMount: call automatically (only once) when a component is rendered for the first time on screen
+  //    good for actions that need to happen once, like filling a class array that doesn't change in this screen
   componentDidMount(){
     // .then waits for the asynchorouns nature of API calls to return the data
     //    before rendering the currectClasses array before the data is ready
@@ -189,7 +186,7 @@ export default class LandingScreen extends Component {
         throw 'Invalid Token';
       }
 
-      //console.log(json);
+      console.log(json);
       let classes = [];
 
       for (let i = 0; i < json.Classes.length; i++) {
@@ -230,7 +227,7 @@ export default class LandingScreen extends Component {
       }
 
       console.log(week);
-      console.log("week[1][0].Code = " + week[1][0].Code);
+      //console.log("week[1][0].Code = " + week[1][0].Code);
       return week;
     } catch (error) {
       if (error === 'Invalid Token') {
@@ -244,6 +241,14 @@ export default class LandingScreen extends Component {
   }
 
   formatTime(inputString) {
+    if (!inputString) {
+        return {
+            days: [],
+            startTime: '',
+            endTime: ''
+        };
+    }
+
     const days = {
         M: 'Monday',
         T: 'Tuesday',
@@ -277,6 +282,7 @@ export default class LandingScreen extends Component {
         endTime
     };
   }
+
 
 
   render() {
