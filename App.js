@@ -21,6 +21,7 @@ import RegisterScreen from './screens/RegScreen';
 import TestScreen from './screens/TestScreen';
 import LandingScreen from './screens/LandingScreen';
 import ClassScreen from './screens/ClassesScreen';
+import PasswordScreen from './screens/PasswordRecScreen';
 
 export default class App extends React.Component {
   render() {
@@ -95,6 +96,22 @@ const AppNavigator = createStackNavigator({
       headerBackTitleStyle: { fontSize: 17 },
       headerBackTitle: "Events",
       headerTintColor: 'black',
+    }
+  },
+  Password:{
+    screen: PasswordScreen,
+    navigationOptions: {
+      title: "Password Recovery",
+      headerTitleStyle: {
+        fontSize: 20,
+        fontWeight: 'bold'
+      },
+      headerStyle: { 
+        backgroundColor: "#F8CD46",
+        borderBottomWidth: 2,
+        borderBottomColor: 'black',
+      },
+      headerTintColor: 'black'
     }
   }
 },{
