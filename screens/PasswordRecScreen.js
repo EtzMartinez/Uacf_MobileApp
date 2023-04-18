@@ -141,13 +141,14 @@ export default class PasswordScreen extends Component {
         global.emailToSendOut = res.user.Email;
         global.cookieToken = res.user.CookieToken;
         global.verificationKey = res.user.VerfKey;
-        console.log("user hopefully update");
+        console.log("email sent");
+        this.setState({messageEmail: "email sent"});
       }
 
     }
     catch (e){
       console.log(e);
-      this.setState({messagePass: e})
+      this.setState({messageEmail: e})
     }
 
 
